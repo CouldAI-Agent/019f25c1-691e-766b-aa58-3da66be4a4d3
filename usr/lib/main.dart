@@ -1,67 +1,59 @@
 import 'package:flutter/material.dart';
+import 'screens/home_screen.dart';
+import 'screens/paper_list_screen.dart';
+import 'screens/paper_viewer_screen.dart';
+import 'models/paper_model.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const MPPSCApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MPPSCApp extends StatelessWidget {
+  const MPPSCApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'MPPSC Papers',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const MyHomePage(title: 'Flutter Demo Home Page'),
-      },
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text('$_counter', style: Theme.of(context).textTheme.headlineMedium),
-          ],
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.teal,
+          brightness: Brightness.light,
+        ),
+        useMaterial3: true,
+        appBarTheme: const AppBarTheme(
+          centerTitle: true,
+          elevation: 0,
+        ),
+        cardTheme: const CardTheme(
+          elevation: 2,
+          margin: EdgeInsets.zero,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), 
+      initialRoute: '/',
+      onGenerateRoute: (settings) {
+        if (settings.name == '/') {
+          return MaterialPageRoute(builder: (_) => const HomeScreen());
+        }
+        
+        if (settings.name == '/papers') {
+          final category = settings.arguments as String?;
+          return MaterialPageRoute(
+            builder: (_) => PaperListScreen(category: category ?? 'Prelims'),
+          );
+        }
+        
+        if (settings.name == '/viewer') {
+          final paper = settings.arguments as Paper?;
+          if (paper == null) return null; // Handle error gracefully if needed
+          return MaterialPageRoute(
+            builder: (_) => PaperViewerScreen(paper: paper),
+          );
+        }
+        
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
+      },
     );
   }
 }
